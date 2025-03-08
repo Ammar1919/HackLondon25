@@ -1,3 +1,4 @@
+import requests
 import os
 from openai import OpenAI
 from dotenv import load_dotenv 
@@ -5,24 +6,35 @@ from supabase import create_client, Client
 import json 
 from database import supabase
 
+
 load_dotenv()
 
 
 #from config import OPENAI_API_KEY
 
-
-
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 
-def get_organ(organ_id: int):
-    response = supabase.table("organs").select("organ, organ_condition, transplant_time, hospital_location").eq("organ_id", organ_id).execute()
+def fetch_organ_id():
+    response = requests.post("http://localhost:5000/api/get_organ_id", json={})
+    if response.status_code == 200:
+        return response.json().get("organ_id")
+    return None
 
+# Get organ details
+def get_organ(organ_id):
+    response = supabase.table("organs").select("organ, organ_condition, transplant_time, hospital_location").eq("organ_id", organ_id).execute()
+    
     if response.data:
         return response.data[0]
     else:
         return {"error": "Organ not found"}
 
-organ = get_organ(5)
+# Fetch organ_id first
+organ_id = fetch_organ_id()
+if organ_id:
+    organ = get_organ(organ_id)
+else:
+    print("Organ not found")
 
 patients = (
     supabase.table("patients")

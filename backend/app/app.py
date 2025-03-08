@@ -31,5 +31,12 @@ def add_organ():
     else:
         return jsonify({"error":"Failed to add organ"})
 
+@app.route('/api/get_organ_id', methods=['POST'])
+def get_organ_id():
+    data = request.json
+    if 'organ_id' in data:
+        return jsonify({"organ_id": data['organ_id']})
+    return jsonify({"error": "organ_id not provided"}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)

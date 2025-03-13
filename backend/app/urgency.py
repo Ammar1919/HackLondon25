@@ -2,6 +2,7 @@ import requests
 import os
 from openai import OpenAI
 from dotenv import load_dotenv 
+import requests
 from supabase import create_client, Client
 import json 
 from database import supabase
@@ -34,7 +35,7 @@ organ_id = fetch_organ_id()
 if organ_id:
     organ = get_organ(organ_id)
 else:
-    print("Organ not found")
+    print("Organ not found")
 
 patients = (
     supabase.table("patients")

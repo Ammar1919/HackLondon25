@@ -30,13 +30,27 @@ def add_organ():
         return jsonify({"message":"Organ added successfully"}), 201
     else:
         return jsonify({"error":"Failed to add organ"})
+    
+# @app.route('/api/get_organ_id', methods=['POST'])
+# def get_organ_id():
+#     data = request.json
+#     if 'organ_id' in data:
+#         return jsonify({"organ_id": data['organ_id']})
+#     return jsonify({"error": "organ_id not provided"}), 400
 
-@app.route('/api/get_organ_id', methods=['POST'])
+@app.route('/api/get_organ_id/', methods=['POST'])
 def get_organ_id():
     data = request.json
-    if 'organ_id' in data:
-        return jsonify({"organ_id": data['organ_id']})
-    return jsonify({"error": "organ_id not provided"}), 400
+    if not data or 'organ_id' not in data:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    organ_id = data['organ_id']
+    response = supabase.table('organs').select('*').eq('organ_id', organ_id).execute()
+    
+    if response.data:
+        return jsonify(response.data[0])
+    else:
+        return jsonify({"error": "Organ not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
